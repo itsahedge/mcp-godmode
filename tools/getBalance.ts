@@ -37,8 +37,22 @@ export const getBalanceTool = {
   }).shape,
   execute: async (args: { trader_address: string }, extra: any) => {
     try {
+      const { trader_address } = args;
+      const isValid = balanceClient.isValidAddress(trader_address);
+      if (!isValid) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: `Invalid Solana address: ${trader_address}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+
       const balance = (await balanceClient.getSolanaTokenBalances(
-        args.trader_address
+        trader_address
       )) as TokenBalanceResults[];
 
       if (balance.length === 0) {
